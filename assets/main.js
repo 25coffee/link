@@ -70,7 +70,6 @@ function renderCard(item, index) {
   const contact = escapeHtml(item.contact ?? "");
   const id = getItemId(item, index);
   const isUnlocked = unlocked.has(id);
-  const createdAt = escapeHtml(item.createdAt ?? "");
 
   return `
     <article class="card">
@@ -90,7 +89,6 @@ function renderCard(item, index) {
                  </button>`
           }
         </dd>
-        ${createdAt ? `<dt>提交时间</dt><dd>${createdAt}</dd>` : ""}
       </dl>
     </article>
   `.trim();
@@ -194,6 +192,7 @@ function gotoPayStep() {
   $("txError").hidden = true;
   const input = $("txInput");
   input.value = "";
+  pickedPayMethod = "";
 }
 
 function validateTxId(txId) {
@@ -246,7 +245,7 @@ function init() {
       $("txError").hidden = false;
       return;
     }
-    // NOTE: 静态站无法真实校验支付，仅做格式校验（28 位数字）。
+    // NOTE: 静态站无法真实校验支付，仅做格式校验。
     $("txError").hidden = true;
     closeModal();
     unlockAndRevealPending();
