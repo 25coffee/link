@@ -21,11 +21,32 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 
 ALIASES = {
-    "title": {"title", "标题"},
-    "content": {"content", "内容", "描述", "正文"},
-    "nickname": {"nickname", "昵称", "姓名", "称呼"},
-    "contact": {"contact", "联系方式", "微信", "手机号", "电话", "邮箱", "email"},
-    "createdAt": {"createdat", "created_at", "提交时间", "时间", "提交日期", "日期"},
+    # Tencent Form exports often contain numbered questions, e.g. "1.您的昵称"
+    "title": {"title", "标题", "项目名称", "创业项目名称", "6.创业项目名称", "6.项目名称"},
+    "content": {"content", "内容", "描述", "正文", "项目核心构想", "7.项目核心构想", "5.个人简介"},
+    "nickname": {"nickname", "昵称", "姓名", "称呼", "1.您的昵称", "1.昵称"},
+    "contact": {"contact", "联系方式", "微信", "手机号", "电话", "邮箱", "email", "2.联系方式"},
+    "createdAt": {
+        "createdat",
+        "created_at",
+        "提交时间",
+        "时间",
+        "提交日期",
+        "日期",
+        "开始答题时间",
+        "开始时间",
+    },
+}
+
+
+IGNORE_DETAIL_HEADERS = {
+    "编号",
+    "IP",
+    "UA",
+    "Referrer",
+    "自定义字段",
+    "清洗数据结果",
+    "智能清洗数据无效概率",
 }
 
 
@@ -89,17 +110,65 @@ def row_to_item(row: Dict[str, str], cols: Dict[str, Optional[str]]) -> Dict[str
         c = cols.get(k)
         return (row.get(c, "") if c else "").strip()
 
-    item = {
-        "title": g("title"),
-        "content": g("content"),
-        "nickname": g("nickname"),
-        "contact": g("contact"),
-    }
+    title = g("title")
+    content = g("content")
+    nickname = g("nickname")
+    contact = g("contact")
+
+    # Fallbacks for Tencent Form export headers
+    if not nickname:
+        nickname = (row.get("1.您的昵称", "") or row.get("1.昵称", "")).strip()
+    if not contact:
+        contact = (row.get("2.联系方式", "") or row.get("2.微信", "") or row.get("2.手机号", "")).strip()
+    if not title:
+        title = (row.get("6.创业项目名称", "") or row.get("6.项目名称", "") or row.get("创业项目名称", "")).strip()
+    if not content:
+        content = (row.get("7.项目核心构想", "") or row.get("项目核心构想", "")).strip()
+        if not content:
+            content = (row.get("5.个人简介", "") or row.get("个人简介", "")).strip()
+
+    item = {"title": title, "content": content, "nickname": nickname, "contact": contact}
 
     created_raw = g("createdAt")
+    if not created_raw:
+        created_raw = (row.get("开始答题时间", "") or row.get("开始时间", "") or "").strip()
     created = parse_time(created_raw)
     if created:
         item["createdAt"] = created
+
+    # Collect most other fields for display
+    detail_items: List[Dict[str, str]] = []
+    used_headers = {h for h in cols.values() if h}
+    # Also include explicit Tencent headers used as fallbacks
+    used_headers.update(
+        {
+            "1.您的昵称",
+            "1.昵称",
+            "2.联系方式",
+            "6.创业项目名称",
+            "6.项目名称",
+            "7.项目核心构想",
+            "5.个人简介",
+            "开始答题时间",
+            "开始时间",
+        }
+    )
+
+    for raw_header, raw_val in row.items():
+        if not raw_header:
+            continue
+        header = raw_header.strip().strip("\ufeff")
+        if not header or header in IGNORE_DETAIL_HEADERS:
+            continue
+        if header in used_headers:
+            continue
+        v = (raw_val or "").strip()
+        if not v:
+            continue
+        detail_items.append({"label": header, "value": v})
+
+    if detail_items:
+        item["details"] = detail_items
     return item
 
 

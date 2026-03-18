@@ -70,6 +70,28 @@ function renderCard(item, index) {
   const contact = escapeHtml(item.contact ?? "");
   const id = getItemId(item, index);
   const isUnlocked = unlocked.has(id);
+  const createdAt = escapeHtml(item.createdAt ?? "");
+
+  const details = Array.isArray(item.details) ? item.details : [];
+  const detailsHtml =
+    details.length > 0
+      ? `
+        <div class="details">
+          <div class="details__title">更多信息</div>
+          <dl class="details__list">
+            ${details
+              .map((d) => {
+                const label = escapeHtml(d?.label ?? "");
+                const value = escapeHtml(d?.value ?? "");
+                if (!label || !value) return "";
+                return `<dt>${label}</dt><dd>${value}</dd>`;
+              })
+              .filter(Boolean)
+              .join("\n")}
+          </dl>
+        </div>
+      `.trim()
+      : "";
 
   return `
     <article class="card">
@@ -89,7 +111,9 @@ function renderCard(item, index) {
                  </button>`
           }
         </dd>
+        ${createdAt ? `<dt>提交时间</dt><dd>${createdAt}</dd>` : ""}
       </dl>
+      ${detailsHtml}
     </article>
   `.trim();
 }

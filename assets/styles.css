@@ -211,6 +211,41 @@ code {
   word-break: break-word;
 }
 
+.details {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.14);
+}
+
+.details__title {
+  font-weight: 800;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 10px;
+}
+
+.details__list {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 8px 10px;
+  margin: 0;
+}
+
+.details__list dt {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.60);
+  font-size: 13px;
+}
+
+.details__list dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .empty {
   padding: 18px;
 }
@@ -397,6 +432,10 @@ code {
   }
 
   .modal__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details__list {
     grid-template-columns: 1fr;
   }
 }
