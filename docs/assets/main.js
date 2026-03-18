@@ -61,6 +61,7 @@ function saveUnlockedSet(set) {
 
 let pendingReveal = null; // { id, contact }
 let unlocked = loadUnlockedSet();
+let pickedPayMethod = ""; // "alipay" | "wechat" | ""
 
 function renderCard(item, index) {
   const title = escapeHtml(item.title ?? "");
@@ -160,12 +161,33 @@ function openModal() {
   const modal = $("contactModal");
   modal.hidden = false;
   document.body.style.overflow = "hidden";
+
+  // Reset to pay step every time
+  $("payStep").hidden = false;
+  $("confirmStep").hidden = true;
+  const input = $("txInput");
+  input.value = "";
+  $("txError").hidden = true;
+  pickedPayMethod = "";
 }
 
 function closeModal() {
   const modal = $("contactModal");
   modal.hidden = true;
   document.body.style.overflow = "";
+}
+
+function gotoConfirmStep(payMethod) {
+  pickedPayMethod = payMethod || "";
+  $("payStep").hidden = true;
+  $("confirmStep").hidden = false;
+  $("txError").hidden = true;
+  const input = $("txInput");
+  input.focus();
+}
+
+function validateTxId(txId) {
+  return /^\d{28}$/.test(txId);
 }
 
 function unlockAndRevealPending() {
@@ -201,11 +223,27 @@ function init() {
 
     const payBtn = t.closest("button[data-pay]");
     if (payBtn) {
-      // Treat clicking a QR as "donated"
-      closeModal();
-      unlockAndRevealPending();
+      // Pick a pay method first, then require transaction id confirmation.
+      const method = payBtn.getAttribute("data-pay") || "";
+      gotoConfirmStep(method);
       return;
     }
+  });
+
+  $("txConfirmBtn").addEventListener("click", () => {
+    const txId = $("txInput").value.trim();
+    if (!validateTxId(txId)) {
+      $("txError").hidden = false;
+      return;
+    }
+    // NOTE: 静态站无法真实校验支付，仅做格式校验（28 位数字）。
+    $("txError").hidden = true;
+    closeModal();
+    unlockAndRevealPending();
+  });
+
+  $("txInput").addEventListener("input", () => {
+    $("txError").hidden = true;
   });
 
   refresh();

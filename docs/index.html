@@ -61,21 +61,40 @@
     <div id="contactModal" class="modal" hidden>
       <div class="modal__backdrop"></div>
       <div class="modal__panel" role="dialog" aria-modal="true" aria-label="显示联系方式">
-        <div class="modal__title">经营码支付</div>
-        <div class="modal__desc">
-          解锁联系方式 <b>¥2.99 / 次</b>。请扫码完成支付后，点击对应二维码即可解锁。
+        <div id="payStep" class="modal__step">
+          <div class="modal__title">经营码支付</div>
+          <div class="modal__desc">
+            解锁联系方式 <b>¥2.99 / 次</b>。请扫码完成支付，然后继续填写交易单号确认。
+          </div>
+          <div class="modal__grid">
+            <button class="paycard" type="button" data-pay="alipay">
+              <img class="paycard__img" src="./assets/pay/alipay-pay.png" alt="支付宝收款码" />
+              <div class="paycard__label">支付宝</div>
+            </button>
+            <button class="paycard" type="button" data-pay="wechat">
+              <img class="paycard__img" src="./assets/pay/wechat-pay.png" alt="微信收款码" />
+              <div class="paycard__label">微信</div>
+            </button>
+          </div>
+          <div class="modal__hint">点击你使用的支付方式，进入交易单号确认。</div>
         </div>
-        <div class="modal__grid">
-          <button class="paycard" type="button" data-pay="alipay">
-            <img class="paycard__img" src="./assets/pay/alipay-pay.png" alt="支付宝收款码" />
-            <div class="paycard__label">支付宝</div>
-          </button>
-          <button class="paycard" type="button" data-pay="wechat">
-            <img class="paycard__img" src="./assets/pay/wechat-pay.png" alt="微信收款码" />
-            <div class="paycard__label">微信</div>
-          </button>
+
+        <div id="confirmStep" class="modal__step" hidden>
+          <div class="modal__title">已支付确认</div>
+          <div class="modal__desc">请输入交易单号（<b>28 位数字</b>）以解锁本条联系方式。</div>
+          <div class="formrow">
+            <input
+              id="txInput"
+              class="input"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="请输入 28 位交易单号"
+            />
+            <button id="txConfirmBtn" class="btn btn--primary" type="button">确认解锁</button>
+          </div>
+          <div id="txError" class="formerror" hidden>未找到此交易单号。</div>
+          <div class="modal__hint">提示：交易单号必须为 0-9 的 28 位数字。</div>
         </div>
-        <div class="modal__hint">支付完成后，点击任意二维码即可解锁并显示该条联系方式。</div>
       </div>
     </div>
 

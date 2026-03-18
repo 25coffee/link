@@ -330,6 +330,37 @@ code {
   line-height: 1.5;
 }
 
+.formrow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.input {
+  width: min(520px, 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px 12px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: rgba(110, 231, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(110, 231, 255, 0.12);
+}
+
+.formerror {
+  margin-top: 10px;
+  text-align: center;
+  color: rgba(255, 107, 107, 0.95);
+  font-size: 13px;
+}
+
 .contact__btn {
   display: inline-flex;
   align-items: center;
