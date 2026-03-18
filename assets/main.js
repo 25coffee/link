@@ -72,27 +72,6 @@ function renderCard(item, index) {
   const isUnlocked = unlocked.has(id);
   const createdAt = escapeHtml(item.createdAt ?? "");
 
-  const details = Array.isArray(item.details) ? item.details : [];
-  const detailsHtml =
-    details.length > 0
-      ? `
-        <div class="details">
-          <div class="details__title">更多信息</div>
-          <dl class="details__list">
-            ${details
-              .map((d) => {
-                const label = escapeHtml(d?.label ?? "");
-                const value = escapeHtml(d?.value ?? "");
-                if (!label || !value) return "";
-                return `<dt>${label}</dt><dd>${value}</dd>`;
-              })
-              .filter(Boolean)
-              .join("\n")}
-          </dl>
-        </div>
-      `.trim()
-      : "";
-
   return `
     <article class="card">
       <h3 class="card__title">${title || "（无标题）"}</h3>
@@ -113,7 +92,6 @@ function renderCard(item, index) {
         </dd>
         ${createdAt ? `<dt>提交时间</dt><dd>${createdAt}</dd>` : ""}
       </dl>
-      ${detailsHtml}
     </article>
   `.trim();
 }
@@ -210,6 +188,14 @@ function gotoConfirmStep(payMethod) {
   input.focus();
 }
 
+function gotoPayStep() {
+  $("payStep").hidden = false;
+  $("confirmStep").hidden = true;
+  $("txError").hidden = true;
+  const input = $("txInput");
+  input.value = "";
+}
+
 function validateTxId(txId) {
   return /^\d{28}$/.test(txId);
 }
@@ -268,6 +254,10 @@ function init() {
 
   $("txInput").addEventListener("input", () => {
     $("txError").hidden = true;
+  });
+
+  $("txBackBtn").addEventListener("click", () => {
+    gotoPayStep();
   });
 
   refresh();
