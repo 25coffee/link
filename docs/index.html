@@ -81,19 +81,19 @@
 
         <div id="confirmStep" class="modal__step" hidden>
           <div class="modal__title">已支付确认</div>
-          <div class="modal__desc">请输入交易单号（<b>28 位数字</b>）以解锁本条联系方式。</div>
+          <div class="modal__desc">请输入交易单号以解锁本条联系方式。</div>
           <div class="formrow">
             <input
               id="txInput"
               class="input"
               inputmode="numeric"
               autocomplete="off"
-              placeholder="请输入 28 位交易单号"
+              placeholder="请输入交易单号"
             />
             <button id="txConfirmBtn" class="btn btn--primary" type="button">确认解锁</button>
           </div>
           <div id="txError" class="formerror" hidden>未找到此交易单号。</div>
-          <div class="modal__hint">提示：交易单号必须为 0-9 的 28 位数字。</div>
+          <div class="modal__hint">提示：请输入正确的交易单号。</div>
         </div>
       </div>
     </div>
