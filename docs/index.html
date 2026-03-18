@@ -59,6 +59,25 @@
       </section>
     </main>
 
+    <div id="contactModal" class="modal" hidden>
+      <div class="modal__backdrop" data-close></div>
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-label="显示联系方式">
+        <button id="modalSkip" class="modal__skip" type="button">跳过</button>
+        <div class="modal__title">打赏小编</div>
+        <div class="modal__grid">
+          <button class="paycard" type="button" data-pay="alipay">
+            <img class="paycard__img" src="./assets/pay/alipay-pay.png" alt="支付宝收款码" />
+            <div class="paycard__label">支付宝</div>
+          </button>
+          <button class="paycard" type="button" data-pay="wechat">
+            <img class="paycard__img" src="./assets/pay/wechat-pay.png" alt="微信收款码" />
+            <div class="paycard__label">微信</div>
+          </button>
+        </div>
+        <div class="modal__hint">打赏或点击右上角“跳过”，即可显示该条联系方式。</div>
+      </div>
+    </div>
+
     <footer class="container footer"></footer>
 
     <script src="./assets/main.js" defer></script>

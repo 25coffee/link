@@ -7,6 +7,8 @@ const CONFIG = {
   DATA_URL: "./data/submissions.json",
 };
 
+const STORAGE_KEY = "contactUnlocked:v1";
+
 function $(id) {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Missing element #${id}`);
@@ -29,11 +31,44 @@ function fmtTime(ts) {
   return d.toLocaleString("zh-CN", { hour12: false });
 }
 
-function renderCard(item) {
+function getItemId(item, index) {
+  const base =
+    (item.title ?? "") + "|" + (item.nickname ?? "") + "|" + (item.createdAt ?? "") + "|" + index;
+  // Simple stable hash (djb2) to keep IDs short.
+  let h = 5381;
+  for (let i = 0; i < base.length; i += 1) h = (h * 33) ^ base.charCodeAt(i);
+  return `i_${(h >>> 0).toString(16)}`;
+}
+
+function loadUnlockedSet() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(arr)) return new Set();
+    return new Set(arr.filter((x) => typeof x === "string"));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveUnlockedSet(set) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+  } catch {
+    // ignore
+  }
+}
+
+let pendingReveal = null; // { id, contact }
+let unlocked = loadUnlockedSet();
+
+function renderCard(item, index) {
   const title = escapeHtml(item.title ?? "");
   const content = escapeHtml(item.content ?? "");
   const nickname = escapeHtml(item.nickname ?? "");
   const contact = escapeHtml(item.contact ?? "");
+  const id = getItemId(item, index);
+  const isUnlocked = unlocked.has(id);
 
   return `
     <article class="card">
@@ -43,7 +78,16 @@ function renderCard(item) {
         <dt>昵称</dt>
         <dd>${nickname || "—"}</dd>
         <dt>联系方式</dt>
-        <dd>${contact || "—"}</dd>
+        <dd>
+          ${
+            isUnlocked
+              ? `<span data-contact-text>${contact || "—"}</span>`
+              : `<span class="contact__hidden" data-contact-masked>已隐藏</span>
+                 <button class="contact__btn" type="button" data-reveal data-id="${id}" data-contact="${contact}">
+                   显示联系方式
+                 </button>`
+          }
+        </dd>
       </dl>
     </article>
   `.trim();
@@ -104,7 +148,7 @@ async function refresh() {
     }
 
     setEmpty(false);
-    list.innerHTML = items.map(renderCard).join("\n");
+    list.innerHTML = items.map((it, idx) => renderCard(it, idx)).join("\n");
   } catch (e) {
     setEmpty(true);
     setMeta({ count: 0, updatedAt: "" });
@@ -112,9 +156,72 @@ async function refresh() {
   }
 }
 
+function openModal() {
+  const modal = $("contactModal");
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  const modal = $("contactModal");
+  modal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+function unlockAndRevealPending() {
+  if (!pendingReveal) return;
+  unlocked.add(pendingReveal.id);
+  saveUnlockedSet(unlocked);
+
+  // Update the specific card in-place
+  const btn = document.querySelector(`button[data-reveal][data-id="${pendingReveal.id}"]`);
+  if (btn) {
+    const dd = btn.closest("dd");
+    if (dd) dd.innerHTML = `<span data-contact-text>${pendingReveal.contact || "—"}</span>`;
+  }
+  pendingReveal = null;
+}
+
 function init() {
   $("formLink").href = CONFIG.FORM_URL;
   $("refreshBtn").addEventListener("click", () => refresh());
+
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+
+    const revealBtn = t.closest("button[data-reveal]");
+    if (revealBtn) {
+      const id = revealBtn.getAttribute("data-id") || "";
+      const contact = revealBtn.getAttribute("data-contact") || "";
+      pendingReveal = { id, contact };
+      openModal();
+      return;
+    }
+
+    const payBtn = t.closest("button[data-pay]");
+    if (payBtn) {
+      // Treat clicking a QR as "donated"
+      closeModal();
+      unlockAndRevealPending();
+      return;
+    }
+
+    if (t.hasAttribute("data-close")) {
+      closeModal();
+      return;
+    }
+  });
+
+  $("modalSkip").addEventListener("click", () => {
+    closeModal();
+    unlockAndRevealPending();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+
   refresh();
 }
 
