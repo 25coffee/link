@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>寻找创业合伙人</title>
+    <meta
+      name="description"
+      content="寻找创业合伙人：填写信息提交后，会在页面展示标题、内容、昵称与联系方式。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <header class="container header">
+      <div class="header__left">
+        <div class="badge">github.io 静态页</div>
+        <h1 class="title">寻找创业合伙人</h1>
+        <p class="subtitle">
+          点“填写信息”去腾讯表单提交后，你的信息会出现在下方列表（标题 / 内容 /
+          昵称 / 联系方式）。
+        </p>
+      </div>
+      <div class="header__right">
+        <a id="formLink" class="btn btn--primary" href="#" target="_blank" rel="noreferrer">
+          填写信息
+        </a>
+        <button id="refreshBtn" class="btn btn--ghost" type="button">刷新列表</button>
+      </div>
+    </header>
+
+    <main class="container main">
+      <section class="panel">
+        <div class="panel__head">
+          <h2 class="panel__title">最新提交</h2>
+          <div class="panel__meta">
+            <span id="countText" class="muted">加载中…</span>
+            <span class="dot">·</span>
+            <span id="updatedText" class="muted"></span>
+          </div>
+        </div>
+
+        <div id="errorBox" class="error" hidden></div>
+
+        <div id="emptyState" class="empty" hidden>
+          <div class="empty__title">暂无展示内容</div>
+          <div class="empty__desc">
+            你可以先点击右上角“填写信息”提交一条，然后把回收数据同步到
+            <code>data/submissions.json</code>。
+          </div>
+        </div>
+
+        <div id="list" class="list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <div class="muted">
+        数据来源：<code>data/submissions.json</code>（静态站展示用）。如何同步请看
+        <code>README.md</code>。
+      </div>
+    </footer>
+
+    <script src="./assets/main.js" defer></script>
+  </body>
+</html>
+
