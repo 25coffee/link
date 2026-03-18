@@ -59,10 +59,12 @@
     </main>
 
     <div id="contactModal" class="modal" hidden>
-      <div class="modal__backdrop" data-close></div>
+      <div class="modal__backdrop"></div>
       <div class="modal__panel" role="dialog" aria-modal="true" aria-label="显示联系方式">
-        <button id="modalSkip" class="modal__skip" type="button">跳过</button>
-        <div class="modal__title">打赏小编</div>
+        <div class="modal__title">经营码支付</div>
+        <div class="modal__desc">
+          解锁联系方式 <b>¥2.99 / 次</b>。请扫码完成支付后，点击对应二维码即可解锁。
+        </div>
         <div class="modal__grid">
           <button class="paycard" type="button" data-pay="alipay">
             <img class="paycard__img" src="./assets/pay/alipay-pay.png" alt="支付宝收款码" />
@@ -73,7 +75,7 @@
             <div class="paycard__label">微信</div>
           </button>
         </div>
-        <div class="modal__hint">打赏或点击右上角“跳过”，即可显示该条联系方式。</div>
+        <div class="modal__hint">支付完成后，点击任意二维码即可解锁并显示该条联系方式。</div>
       </div>
     </div>
 

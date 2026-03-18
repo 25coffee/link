@@ -84,7 +84,7 @@ function renderCard(item, index) {
               ? `<span data-contact-text>${contact || "—"}</span>`
               : `<span class="contact__hidden" data-contact-masked>已隐藏</span>
                  <button class="contact__btn" type="button" data-reveal data-id="${id}" data-contact="${contact}">
-                   显示联系方式
+                   解锁联系方式（¥2.99/次）
                  </button>`
           }
         </dd>
@@ -206,20 +206,6 @@ function init() {
       unlockAndRevealPending();
       return;
     }
-
-    if (t.hasAttribute("data-close")) {
-      closeModal();
-      return;
-    }
-  });
-
-  $("modalSkip").addEventListener("click", () => {
-    closeModal();
-    unlockAndRevealPending();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
   });
 
   refresh();
