@@ -266,6 +266,9 @@ code {
   border: 1px solid var(--border);
   background: rgba(15, 20, 36, 0.92);
   box-shadow: var(--shadow);
+  max-height: calc(100vh - 28px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal__skip {
