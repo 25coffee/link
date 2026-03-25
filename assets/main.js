@@ -8,6 +8,8 @@ const CONFIG = {
 };
 
 const STORAGE_KEY = "contactUnlocked:v1";
+const VIEW_COUNTER_KEY = "25coffee-link-homepage";
+const VIEW_COUNTER_NS = "25coffee-link";
 
 function $(id) {
   const el = document.getElementById(id);
@@ -132,6 +134,25 @@ function setEmpty(isEmpty) {
 function setMeta({ count, updatedAt }) {
   $("countText").textContent = `共 ${count} 条`;
   $("updatedText").textContent = updatedAt ? `更新于 ${fmtTime(updatedAt)}` : "";
+}
+
+async function updateViews() {
+  const el = document.getElementById("viewText");
+  if (!el) return;
+  el.textContent = "浏览量：—";
+  try {
+    const url = `https://api.countapi.xyz/hit/${encodeURIComponent(VIEW_COUNTER_NS)}/${encodeURIComponent(
+      VIEW_COUNTER_KEY,
+    )}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const v = Number(data?.value);
+    if (!Number.isFinite(v)) throw new Error("bad value");
+    el.textContent = `浏览量：${v}`;
+  } catch {
+    // silently keep placeholder
+  }
 }
 
 async function refresh() {
@@ -259,6 +280,7 @@ function init() {
     gotoPayStep();
   });
 
+  updateViews();
   refresh();
 }
 
