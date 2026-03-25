@@ -151,7 +151,9 @@ async function updateViews() {
     if (!Number.isFinite(v)) throw new Error("bad value");
     el.textContent = `浏览量：${v}`;
   } catch {
-    // silently keep placeholder
+    // Fallback to busuanzi if available
+    const bz = document.getElementById("busuanzi_container_page_pv");
+    if (bz) bz.style.display = "";
   }
 }
 
